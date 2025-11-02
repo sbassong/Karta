@@ -4,9 +4,10 @@ import {
   Text,
   TouchableOpacity,
   Modal,
-  SafeAreaView,
   Image,
 } from "react-native";
+import { SafeAreaView } from "react-native-safe-area-context";
+
 import * as Location from "expo-location";
 import { styles } from "./styles";
 

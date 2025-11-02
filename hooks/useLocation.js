@@ -27,5 +27,5 @@ export const useLocation = () => {
     })();
   }, []);
 
-  return { location, errorMsg, isLoading };
+  return { location, errorMsg, isLoading};
 };
