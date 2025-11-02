@@ -1,21 +1,10 @@
-import React from 'react';
-import { StyleSheet, View, Text, ActivityIndicator } from 'react-native';
-import MapView, { Marker, PROVIDER_OPENSTREETMAP } from 'react-native-maps';
-import { useLocation } from '../hooks/useLocation';
-import { POI_DATA } from '../data/poi';
+import React from "react";
+import { StyleSheet, View, Text, ActivityIndicator } from "react-native";
+import MapView, { Marker, PROVIDER_OPENSTREETMAP } from "react-native-maps";
+import { styles } from "./styles";
+import { useLocation } from "../../hooks/useLocation";
+import { POI_DATA } from "../../data/poi";
 
-const styles = StyleSheet.create({ // will be moved to own file in future
-  container: {
-    flex: 99,
-    backgroundColor: '#fff',
-    alignItems: 'center',
-    justifyContent: 'center',
-  },
-  map: {
-    width: '100%',
-    height: '90%',
-  },
-});
 
 export default function MapScreen() {
   const { location, errorMsg, isLoading } = useLocation();
@@ -40,18 +29,18 @@ export default function MapScreen() {
   // Set the initial map region to the user's location, if any
   const initialRegion = location
     ? {
-      latitude: location.latitude,
-      longitude: location.longitude,
-      latitudeDelta: 0.02,
-      longitudeDelta: 0.02,
-    }
+        latitude: location.latitude,
+        longitude: location.longitude,
+        latitudeDelta: 0.02,
+        longitudeDelta: 0.02,
+      }
     : {
-      // default coords (will specify later)
-      latitude: 4.0502,
-      longitude: 9.7676,
-      latitudeDelta: 0.02,
-      longitudeDelta: 0.02,
-    };
+        // default coords (will specify later)
+        latitude: 4.0502,
+        longitude: 9.7676,
+        latitudeDelta: 0.02,
+        longitudeDelta: 0.02,
+      };
 
   return (
     <View style={styles.container}>
