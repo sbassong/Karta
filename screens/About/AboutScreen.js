@@ -1,8 +1,8 @@
 import React, { useState } from 'react';
 import { View, Text, TouchableOpacity } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
-import { styles } from "./styles"
-import BackButton from '../../components/BackButton/BackButton';
+import { styles } from "./styles";
+import BackButton from "../../components/BackButton/BackButton";
 
 const fullAboutText =
   'Our mission is to build a community-driven map of essential services for rural Cameroon. We believe finding a clinic or clean water should be simple, reliable, and available to everyone, even offline.\n\nEvery location on this map was added by a neighbor to help keep others safe and informed. Find what you need, and in our next update, you\'ll be able to add what\'s missing!';

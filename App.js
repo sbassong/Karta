@@ -29,7 +29,7 @@ export default function App() {
   return (
     <NavigationContainer>
       <StatusBar style="auto" />
-      <Stack.Navigator initialRouteName="About">
+      <Stack.Navigator initialRouteName="Map">
         <Stack.Screen name="Map" component={MapScreen} />
         <Stack.Screen name="Welcome" component={WelcomeScreen} />
         <Stack.Screen name="About" component={AboutScreen} />
