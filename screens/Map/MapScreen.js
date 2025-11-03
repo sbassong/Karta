@@ -1,17 +1,20 @@
 import React from "react";
-import { StyleSheet, View, Text, ActivityIndicator } from "react-native";
-import MapView, { Marker, PROVIDER_OPENSTREETMAP } from "react-native-maps";
+import { View, Text, ActivityIndicator } from "react-native";
+import MapView, {
+  Marker,
+  Callout,
+  PROVIDER_OPENSTREETMAP,
+} from "react-native-maps";
 import { styles } from "./styles";
 import { useLocation } from "../../hooks/useLocation";
 import { POI_DATA } from "../../data/poi";
 
-
-export default function MapScreen() {
+export default function MapScreen({ navigation }) {
   const { location, errorMsg, isLoading } = useLocation();
 
   if (isLoading) {
     return (
-      <View style={styles.container}>
+      <View style={styles.centered}>
         <ActivityIndicator size="large" />
         <Text>Loading map...</Text>
       </View>
@@ -20,7 +23,7 @@ export default function MapScreen() {
 
   if (errorMsg) {
     return (
-      <View style={styles.container}>
+      <View style={styles.centered}>
         <Text>{errorMsg}</Text>
       </View>
     );
@@ -57,7 +60,13 @@ export default function MapScreen() {
             coordinate={poi.coordinates}
             title={poi.name}
             description={poi.type}
-          />
+            // calloutAnchor={{ x: 0.5, y: 0.1 }}
+          >
+            <Callout
+              onPress={() => navigation.navigate("Details", { item: poi })}
+            >
+            </Callout>
+          </Marker>
         ))}
       </MapView>
     </View>
