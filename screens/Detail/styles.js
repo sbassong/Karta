@@ -9,12 +9,11 @@ export const styles = StyleSheet.create({
     backgroundColor: Colors.background,
   },
   header: {
-    paddingHorizontal: 15,
-    paddingTop: 10,
+    paddingLeft: 10,
+    paddingTop: 5,
     position: "absolute",
-    top: 50,
+    top: 0,
     left: 0,
-    right: 0,
     zIndex: 10,
   },
   carouselContainer: {
