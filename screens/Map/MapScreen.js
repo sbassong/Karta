@@ -1,4 +1,4 @@
-import React from "react";
+import React, {useState} from "react";
 import { View, Text, ActivityIndicator } from "react-native";
 import MapView, {
   Marker,
@@ -9,8 +9,11 @@ import { styles } from "./styles";
 import { useLocation } from "../../hooks/useLocation";
 import { POI_DATA } from "../../data/poi";
 
+import FilterDropdown from "../../components/FilterDropdown/FilterDropdown"
+
 export default function MapScreen({ navigation }) {
   const { location, errorMsg, isLoading } = useLocation();
+  const [filter, setFilter] = useState("All");
 
   if (isLoading) {
     return (
@@ -47,6 +50,7 @@ export default function MapScreen({ navigation }) {
 
   return (
     <View style={styles.container}>
+      <FilterDropdown filter={filter} onValueChange={setFilter} />
       <MapView
         style={styles.map}
         provider={PROVIDER_OPENSTREETMAP}
@@ -54,6 +58,7 @@ export default function MapScreen({ navigation }) {
         showsUserLocation={true}
         showsMyLocationButton={true}
       >
+
         {POI_DATA.map((poi) => (
           <Marker
             key={poi.id}
@@ -64,8 +69,7 @@ export default function MapScreen({ navigation }) {
           >
             <Callout
               onPress={() => navigation.navigate("Details", { item: poi })}
-            >
-            </Callout>
+            ></Callout>
           </Marker>
         ))}
       </MapView>
