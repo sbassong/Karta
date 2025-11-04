@@ -1,4 +1,4 @@
-import React, {useState} from "react";
+import React, {useState, useMemo} from "react";
 import { View, Text, ActivityIndicator } from "react-native";
 import MapView, {
   Marker,
@@ -10,10 +10,23 @@ import { useLocation } from "../../hooks/useLocation";
 import { POI_DATA } from "../../data/poi";
 
 import FilterDropdown from "../../components/FilterDropdown/FilterDropdown"
+import ServiceList from "../../components/ServiceList/ServiceList";
 
 export default function MapScreen({ navigation }) {
   const { location, errorMsg, isLoading } = useLocation();
   const [filter, setFilter] = useState("All");
+
+  // memoized re-calculation of the list when the filter or data changes
+  const filteredData = useMemo(() => {
+    if (filter === "All") {
+      return POI_DATA;
+    }
+    return POI_DATA.filter((poi) => poi.type === filter);
+  }, [filter]);
+
+  const goToDetails = (poi) => {
+    navigation.navigate("Details", { item: poi });
+  };
 
   if (isLoading) {
     return (
@@ -50,7 +63,8 @@ export default function MapScreen({ navigation }) {
 
   return (
     <View style={styles.container}>
-      <FilterDropdown filter={filter} onValueChange={setFilter} />
+      {/* <FilterDropdown filter={filter} onValueChange={setFilter} /> */}
+      {/* <ServiceList data={filteredData} onSelectItem={goToDetails} /> */}
       <MapView
         style={styles.map}
         provider={PROVIDER_OPENSTREETMAP}
@@ -58,8 +72,7 @@ export default function MapScreen({ navigation }) {
         showsUserLocation={true}
         showsMyLocationButton={true}
       >
-
-        {POI_DATA.map((poi) => (
+        {filteredData.map((poi) => (
           <Marker
             key={poi.id}
             coordinate={poi.coordinates}
@@ -67,9 +80,7 @@ export default function MapScreen({ navigation }) {
             description={poi.type}
             // calloutAnchor={{ x: 0.5, y: 0.1 }}
           >
-            <Callout
-              onPress={() => navigation.navigate("Details", { item: poi })}
-            ></Callout>
+            <Callout onPress={() => goToDetails(poi)}></Callout>
           </Marker>
         ))}
       </MapView>
