@@ -1,5 +1,5 @@
-import React, {useState, useMemo} from "react";
-import { View, Text, ActivityIndicator } from "react-native";
+import React, { useState, useMemo, useRef } from "react";
+import { View, Text, ActivityIndicator, TouchableOpacity } from "react-native";
 import MapView, {
   Marker,
   Callout,
@@ -8,12 +8,31 @@ import MapView, {
 import { styles } from "./styles";
 import { useLocation } from "../../hooks/useLocation";
 import { POI_DATA } from "../../data/poi";
+import { MaterialIcons } from "@expo/vector-icons";
+import { WarmCommunityColors } from "../../utilities/theme";
 
-import FilterDropdown from "../../components/FilterDropdown/FilterDropdown"
+import FilterDropdown from "../../components/FilterDropdown/FilterDropdown";
 import ServiceList from "../../components/ServiceList/ServiceList";
+import MapButtons from "../../components/MapButtons/MapButtons";
+import { CustomMarkerIcon } from "../../components/ServiceIcon/ServiceIcon";
+
+const Colors = WarmCommunityColors.light;
+// helpe for getting icons based on poi type
+// const getMarkerIcon = (type) => {
+//   if (type === "Health") {
+//     return <FontAwesome5 name="clinic-medical" size={30} color="#D9534F" />;
+//   }
+//   if (type === "Water") {
+//     return <Ionicons name="water" size={30} color="#0275D8" />;
+//   }
+//   return <Ionicons name="location-sharp" size={30} color={Colors.icon} />;
+// };
 
 export default function MapScreen({ navigation }) {
   const { location, errorMsg, isLoading } = useLocation();
+  const mapViewRef = useRef(null);
+
+  const [viewMode, setViewMode] = useState("map"); // 'map' or 'list'
   const [filter, setFilter] = useState("All");
 
   // memoized re-calculation of the list when the filter or data changes
@@ -26,6 +45,21 @@ export default function MapScreen({ navigation }) {
 
   const goToDetails = (poi) => {
     navigation.navigate("Details", { item: poi });
+  };
+
+  const goToAbout = () => {
+    navigation.navigate("About");
+  };
+
+  const centerOnUser = () => {
+    if (location && mapViewRef.current) {
+      mapViewRef.current.animateToRegion({
+        latitude: location.latitude,
+        longitude: location.longitude,
+        latitudeDelta: 0.02,
+        longitudeDelta: 0.02,
+      });
+    }
   };
 
   if (isLoading) {
@@ -45,45 +79,56 @@ export default function MapScreen({ navigation }) {
     );
   }
 
-  // Set the initial map region to the user's location, if any
-  const initialRegion = location
-    ? {
-        latitude: location.latitude,
-        longitude: location.longitude,
-        latitudeDelta: 0.02,
-        longitudeDelta: 0.02,
-      }
-    : {
-        // default coords (will specify later)
-        latitude: 4.0502,
-        longitude: 9.7676,
-        latitudeDelta: 0.02,
-        longitudeDelta: 0.02,
-      };
-
   return (
     <View style={styles.container}>
-      {/* <FilterDropdown filter={filter} onValueChange={setFilter} /> */}
-      {/* <ServiceList data={filteredData} onSelectItem={goToDetails} /> */}
-      <MapView
-        style={styles.map}
-        provider={PROVIDER_OPENSTREETMAP}
-        initialRegion={initialRegion}
-        showsUserLocation={true}
-        showsMyLocationButton={true}
-      >
-        {filteredData.map((poi) => (
-          <Marker
-            key={poi.id}
-            coordinate={poi.coordinates}
-            title={poi.name}
-            description={poi.type}
-            // calloutAnchor={{ x: 0.5, y: 0.1 }}
-          >
-            <Callout onPress={() => goToDetails(poi)}></Callout>
-          </Marker>
-        ))}
-      </MapView>
+      {/* dropdown and view mode icon */}
+      <View style={styles.topBar}>
+        <FilterDropdown filter={filter} onValueChange={setFilter} />
+        <TouchableOpacity
+          style={styles.toggleButton}
+          onPress={() => setViewMode(viewMode === "map" ? "list" : "map")}
+        >
+          {viewMode === "map" ? (
+            <MaterialIcons name="list" size={30} color={Colors.icon} />
+          ) : (
+            <MaterialIcons name="map" size={30} color={Colors.icon} />
+          )}
+        </TouchableOpacity>
+      </View>
+
+      {/* conditionally render map or list */}
+      {viewMode === "map" ? (
+        <MapView
+          ref={mapViewRef}
+          style={styles.map}
+          // provider={PROVIDER_OPENSTREETMAP}
+          initialRegion={{
+            latitude: location?.latitude,
+            longitude: location?.longitude,
+            latitudeDelta: 0.02,
+            longitudeDelta: 0.02,
+          }}
+          showsUserLocation={true}
+          showsMyLocationButton={false}
+        >
+          {filteredData.map((poi) => (
+            <Marker
+              key={poi.id}
+              coordinate={poi.coordinates}
+              title={poi.name}
+              calloutAnchor={{ x: 0.5, y: 0.1 }}
+            >
+              <CustomMarkerIcon type={poi.type}/>
+              <Callout onPress={() => goToDetails(poi)}></Callout>
+            </Marker>
+          ))}
+        </MapView>
+      ) : (
+        <ServiceList data={filteredData} onSelectItem={goToDetails} />
+      )}
+
+      {/* map buttons */}
+      <MapButtons onHelpPress={goToAbout} onLocationPress={centerOnUser} />
     </View>
   );
 }
