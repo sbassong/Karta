@@ -11,7 +11,8 @@ export const styles = StyleSheet.create({
     borderWidth: 1,
     borderColor: Colors.cardBorder,
     justifyContent: "center",
-    marginRight: 10,
+    marginRight: "50%",
+
   },
   picker: {
     color: Colors.text,

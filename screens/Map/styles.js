@@ -7,6 +7,7 @@ export const styles = StyleSheet.create({
   container: {
     flex: 1,
     backgroundColor: Colors.background,
+    position: "relative",
   },
   centered: {
     flex: 1,
@@ -16,42 +17,23 @@ export const styles = StyleSheet.create({
   },
   map: {
     flex: 1,
+    position: "relative",
   },
   
   topBar: {
-    paddingHorizontal: 15,
-    paddingVertical: 10,
+    position: "absolute",
+    paddingHorizontal: 10,
+    width: "100%",
     paddingTop: 5,
     flexDirection: "row",
     alignItems: "center",
-    backgroundColor: Colors.background,
+    top: 0,
+    left: 0,
     zIndex: 10,
   },
   toggleButton: {
     padding: 5,
   },
 
-  calloutContainer: {
-    width: 200,
-    padding: 10,
-    backgroundColor: "#fff",
-    borderRadius: 8,
-    borderColor: "#ccc",
-    borderWidth: 1,
-  },
-  calloutTitle: {
-    fontSize: 16,
-    fontWeight: "bold",
-    color: "#000",
-  },
-  calloutDescription: {
-    fontSize: 14,
-    color: "#333",
-  },
-  calloutLink: {
-    fontSize: 14,
-    color: "#007AFF",
-    marginTop: 5,
-    fontWeight: "bold",
-  },
+
 });

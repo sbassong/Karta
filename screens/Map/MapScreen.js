@@ -110,6 +110,7 @@ export default function MapScreen({ navigation }) {
           }}
           showsUserLocation={true}
           showsMyLocationButton={false}
+          toolbarEnabled={false} // to remove native buttons from map
         >
           {filteredData.map((poi) => (
             <Marker
@@ -118,7 +119,7 @@ export default function MapScreen({ navigation }) {
               title={poi.name}
               calloutAnchor={{ x: 0.5, y: 0.1 }}
             >
-              <CustomMarkerIcon type={poi.type}/>
+              <CustomMarkerIcon type={poi.type} />
               <Callout onPress={() => goToDetails(poi)}></Callout>
             </Marker>
           ))}
@@ -128,7 +129,9 @@ export default function MapScreen({ navigation }) {
       )}
 
       {/* map buttons */}
-      <MapButtons onHelpPress={goToAbout} onLocationPress={centerOnUser} />
+      {/* {viewMode === "map" && ( */}
+        <MapButtons onHelpPress={goToAbout} onLocationPress={centerOnUser} viewMode={viewMode} />
+      {/* )} */}
     </View>
   );
 }

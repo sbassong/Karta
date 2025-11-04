@@ -13,7 +13,7 @@ export const styles = StyleSheet.create({
     fontWeight: "bold",
     color: Colors.text,
     paddingHorizontal: 20,
-    paddingTop: 20,
+    paddingTop: 70,
     marginBottom: 10,
   },
   itemContainer: {
