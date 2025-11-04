@@ -7,12 +7,12 @@ const Colors = WarmCommunityColors.light;
 // renders the icon based on the type
 const Icon = ({ type }) => {
   if (type === "Health") {
-    return <FontAwesome5 name="clinic-medical" size={30} color="#D9534F" />;
+    return <FontAwesome5 name="clinic-medical" size={26} color="#D9534F" />;
   }
   if (type === "Water") {
     return <Ionicons name="water" size={30} color="#0275D8" />;
   }
-  return <Ionicons name="location-sharp" size={30} color={Colors.icon} />;
+  return <Ionicons name="location-sharp" size={26} color={Colors.icon} />;
 };
 
 // needed to prevent flickering

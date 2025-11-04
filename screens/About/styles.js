@@ -11,8 +11,12 @@ export const styles = StyleSheet.create({
   header: {
     flexDirection: "row",
     alignItems: "center",
-    paddingHorizontal: 15,
+    paddingLeft: 10,
     paddingTop: 10,
+    position: "absolute",
+    top: 0,
+    left: 0,
+    zIndex: 10,
   },
   content: {
     flex: 1,

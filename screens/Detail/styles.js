@@ -10,13 +10,14 @@ export const styles = StyleSheet.create({
   },
   header: {
     paddingLeft: 10,
-    paddingTop: 5,
+    paddingTop: 10,
     position: "absolute",
     top: 0,
     left: 0,
     zIndex: 10,
   },
   carouselContainer: {
+    marginTop: 5,
     height: 250,
     backgroundColor: "#f0f0f0",
   },

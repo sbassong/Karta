@@ -17,16 +17,6 @@ import MapButtons from "../../components/MapButtons/MapButtons";
 import { CustomMarkerIcon } from "../../components/ServiceIcon/ServiceIcon";
 
 const Colors = WarmCommunityColors.light;
-// helpe for getting icons based on poi type
-// const getMarkerIcon = (type) => {
-//   if (type === "Health") {
-//     return <FontAwesome5 name="clinic-medical" size={30} color="#D9534F" />;
-//   }
-//   if (type === "Water") {
-//     return <Ionicons name="water" size={30} color="#0275D8" />;
-//   }
-//   return <Ionicons name="location-sharp" size={30} color={Colors.icon} />;
-// };
 
 export default function MapScreen({ navigation }) {
   const { location, errorMsg, isLoading } = useLocation();
@@ -101,7 +91,7 @@ export default function MapScreen({ navigation }) {
         <MapView
           ref={mapViewRef}
           style={styles.map}
-          // provider={PROVIDER_OPENSTREETMAP}
+          provider={PROVIDER_OPENSTREETMAP}
           initialRegion={{
             latitude: location?.latitude,
             longitude: location?.longitude,
@@ -110,6 +100,7 @@ export default function MapScreen({ navigation }) {
           }}
           showsUserLocation={true}
           showsMyLocationButton={false}
+          googleRenderer={"LEGACY"}
           toolbarEnabled={false} // to remove native buttons from map
         >
           {filteredData.map((poi) => (
@@ -117,7 +108,8 @@ export default function MapScreen({ navigation }) {
               key={poi.id}
               coordinate={poi.coordinates}
               title={poi.name}
-              calloutAnchor={{ x: 0.5, y: 0.1 }}
+              calloutAnchor={{ x: 0.4, y: 0 }}
+              trackViewChanges={false}
             >
               <CustomMarkerIcon type={poi.type} />
               <Callout onPress={() => goToDetails(poi)}></Callout>
@@ -128,10 +120,11 @@ export default function MapScreen({ navigation }) {
         <ServiceList data={filteredData} onSelectItem={goToDetails} />
       )}
 
-      {/* map buttons */}
-      {/* {viewMode === "map" && ( */}
-        <MapButtons onHelpPress={goToAbout} onLocationPress={centerOnUser} viewMode={viewMode} />
-      {/* )} */}
+      <MapButtons
+        onHelpPress={goToAbout}
+        onLocationPress={centerOnUser}
+        viewMode={viewMode}
+      />
     </View>
   );
 }

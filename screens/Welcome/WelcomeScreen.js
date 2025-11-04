@@ -1,33 +1,45 @@
-import React, { useState } from "react";
-import {
-  View,
-  Text,
-  TouchableOpacity,
-  Modal,
-  Image,
-} from "react-native";
+import React, { useState, useEffect } from "react";
+import { View, Text, TouchableOpacity, Modal, Image } from "react-native";
 import { SafeAreaView } from "react-native-safe-area-context";
-
-import * as Location from "expo-location";
 import { styles } from "./styles";
 
+import { useLocationPermissions } from "../../context/LocationContext";
+
 export default function WelcomeScreen({ navigation }) {
+  const { permissionStatus, requestPermissions } = useLocationPermissions();
+
   const [modalVisible, setModalVisible] = useState(false);
 
-  const handleAllowPress = () => setModalVisible(true);
+  useEffect(() => {
+    if (permissionStatus === "granted") {
+      navigation.replace("Map");
+    }
+  }, [permissionStatus, navigation]);
 
-  const requestPermissions = async () => {
+  const handleAllowPress = async () => {
+    setModalVisible(true);
+  };
+
+  const handlePermissionRequest = async () => {
     setModalVisible(false);
 
-    let { status } = await Location.requestForegroundPermissionsAsync();
-
-    if (status === "granted") navigation.replace("Map");
+    const status = await requestPermissions();
+    if (status === "granted") {
+      navigation.replace("Map");
+    }
   };
+
+  if (permissionStatus === null) {
+    return <View style={styles.container} />;
+  }
 
   return (
     <SafeAreaView style={styles.container}>
       <View style={styles.content}>
-        <Image source={require("../../assets/cameroon.png")} style={styles.icon} />
+        <Image
+          source={require("../../assets/cameroon.png")}
+          style={styles.icon}
+        />
         <Text style={styles.title}>Welcome to Karta, Your Village Map</Text>
         <Text style={styles.subtitle}>
           This app works OFFLINE. Find clinics, water, and other essential
@@ -56,7 +68,7 @@ export default function WelcomeScreen({ navigation }) {
             </Text>
             <TouchableOpacity
               style={styles.modalButton}
-              onPress={requestPermissions}
+              onPress={handlePermissionRequest}
             >
               <Text style={styles.buttonText}>Yes, I understand</Text>
             </TouchableOpacity>

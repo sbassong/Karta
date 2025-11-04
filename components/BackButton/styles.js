@@ -5,7 +5,7 @@ const Colors = WarmCommunityColors.light;
 
 export const styles = StyleSheet.create({
   backButton: {
-    paddingVertical: 10,
+    paddingVertical: 8,
     paddingHorizontal: 10,
     backgroundColor: Colors.tint,
     borderRadius: 10,
