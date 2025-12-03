@@ -1,10 +1,11 @@
 import React, { useState, useMemo, useRef } from "react";
 import { View, Text, ActivityIndicator, TouchableOpacity } from "react-native";
-import MapView, {
-  Marker,
+import {
+  MapView,
+Camera,
+  PointAnnotation,
   Callout,
-  PROVIDER_OPENSTREETMAP,
-} from "react-native-maps";
+} from "@maplibre/maplibre-react-native";
 import { styles } from "./styles";
 import { useLocation } from "../../hooks/useLocation";
 import { POI_DATA } from "../../data/poi";
@@ -15,12 +16,13 @@ import FilterDropdown from "../../components/FilterDropdown/FilterDropdown";
 import ServiceList from "../../components/ServiceList/ServiceList";
 import MapButtons from "../../components/MapButtons/MapButtons";
 import { CustomMarkerIcon } from "../../components/ServiceIcon/ServiceIcon";
+import { OSM_RASTER_STYLE } from "../../utilities/mapStyle";
 
 const Colors = WarmCommunityColors.light;
 
 export default function MapScreen({ navigation }) {
   const { location, errorMsg, isLoading } = useLocation();
-  const mapViewRef = useRef(null);
+  const cameraRef = useRef(null);
 
   const [viewMode, setViewMode] = useState("map"); // 'map' or 'list'
   const [filter, setFilter] = useState("All");
@@ -42,12 +44,11 @@ export default function MapScreen({ navigation }) {
   };
 
   const centerOnUser = () => {
-    if (location && mapViewRef.current) {
-      mapViewRef.current.animateToRegion({
-        latitude: location.latitude,
-        longitude: location.longitude,
-        latitudeDelta: 0.02,
-        longitudeDelta: 0.02,
+    if (location && cameraRef.current) {
+      cameraRef.current.setCamera({
+        centerCoordinate: [location.longitude, location.latitude],
+        zoomLevel: 14,
+        animationDuration: 1000,
       });
     }
   };
@@ -89,31 +90,39 @@ export default function MapScreen({ navigation }) {
       {/* conditionally render map or list */}
       {viewMode === "map" ? (
         <MapView
-          ref={mapViewRef}
           style={styles.map}
-          provider={PROVIDER_OPENSTREETMAP}
-          initialRegion={{
-            latitude: location?.latitude,
-            longitude: location?.longitude,
-            latitudeDelta: 0.02,
-            longitudeDelta: 0.02,
-          }}
-          showsUserLocation={true}
-          showsMyLocationButton={false}
-          googleRenderer={"LEGACY"}
-          toolbarEnabled={false} // to remove native buttons from map
+          mapStyle={JSON.stringify(OSM_RASTER_STYLE)}
+          logoEnabled={false}
+          attributionEnabled={true}
         >
+          {/* handles the view region */}
+          <Camera
+            ref={cameraRef}
+            defaultSettings={{
+              centerCoordinate: [10.922643, 3.596563], // lng first
+              zoomLevel: 12,
+            }}
+          />
+
           {filteredData.map((poi) => (
-            <Marker
+            <PointAnnotation
               key={poi.id}
-              coordinate={poi.coordinates}
-              title={poi.name}
-              calloutAnchor={{ x: 0.4, y: 0 }}
-              trackViewChanges={false}
+              id={poi.id}
+              // !! object {lat, long} needs to be converted to Array [long, lat]
+              coordinate={[poi.coordinates.longitude, poi.coordinates.latitude]}
             >
               <CustomMarkerIcon type={poi.type} />
-              <Callout onPress={() => goToDetails(poi)}></Callout>
-            </Marker>
+
+              {/* bubble/tooltip that appears when clicked */}
+              <Callout onPress={() => goToDetails(poi)}>
+                <View style={styles.calloutBubble}>
+                  <Text style={styles.calloutText}>{poi.name}</Text>
+                  <Text style={styles.calloutSubText}>
+                    Tap for details
+                  </Text>
+                </View>
+              </Callout>
+            </PointAnnotation>
           ))}
         </MapView>
       ) : (
@@ -128,3 +137,4 @@ export default function MapScreen({ navigation }) {
     </View>
   );
 }
+

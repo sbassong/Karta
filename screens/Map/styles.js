@@ -19,7 +19,7 @@ export const styles = StyleSheet.create({
     flex: 1,
     position: "relative",
   },
-  
+
   topBar: {
     position: "absolute",
     paddingHorizontal: 10,
@@ -35,5 +35,19 @@ export const styles = StyleSheet.create({
     padding: 5,
   },
 
-
+  calloutBubble: {
+    backgroundColor: "white",
+    padding: 10,
+    borderRadius: 8,
+    minWidth: 120,
+    alignItems: "center",
+  },
+  calloutText: {
+    fontWeight: "bold",
+    marginBottom: 4,
+  },
+  calloutSubText: {
+    fontSize: 12,
+    color: "#666",
+  },
 });
