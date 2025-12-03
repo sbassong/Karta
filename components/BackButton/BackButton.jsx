@@ -1,6 +1,6 @@
 import React from "react";
 import { TouchableOpacity, Text } from "react-native";
-import { styles } from "../BackButton/styles";
+import { styles } from "./styles";
 
 export default function BackButton({ onPress }) {
   return (

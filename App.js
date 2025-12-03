@@ -10,6 +10,8 @@ import MapScreen from "./screens/Map/MapScreen";
 import WelcomeScreen from "./screens/Welcome/WelcomeScreen";
 import AboutScreen from "./screens/About/AboutScreen";
 import DetailScreen from "./screens/Detail/DetailScreen";
+import RegisterForm from "./screens/Register/RegisterForm";
+// import LoginForm from "./screens/Login/LoginForm";
 
 const BASE_URL = process.env.EXPO_PUBLIC_BASE_URL;
 const Stack = createNativeStackNavigator();
@@ -65,7 +67,22 @@ export default function App() {
             options={{
               title: "About Karta",
             }}
+            initialParams={setUser}
           />
+          <Stack.Screen
+            name="Register"
+            component={RegisterForm}
+            options={{
+              title: "About Karta",
+            }}
+          />
+          {/* <Stack.Screen
+            name="Login"
+            component={LoginForm}
+            options={{
+              title: "About Karta",
+            }}
+          /> */}
         </Stack.Navigator>
       </NavigationContainer>
     </LocationProvider>
