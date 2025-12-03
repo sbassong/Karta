@@ -42,11 +42,11 @@ export default function LoginForm({ navigation, setUser }) {
         console.log("Success: Logged in!", responseData);
         setMessage("Success: Logged in!");
         await SecureStore.setItemAsync("userToken", responseData?.token);
-        setUser(responseData.payload);
+        setUser(responseData.user);
         navigation.replace("Map");
         setMessage("");
       } else {
-        console.error("Error: Login failed: ", responseData.error.msg);
+        console.error("Error: Login failed: ", responseData.error);
         setMessage("Error: Login failed.");
       }
     } catch (error) {
