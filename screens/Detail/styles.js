@@ -37,6 +37,13 @@ export const styles = StyleSheet.create({
     color: Colors.text,
     marginBottom: 8,
   },
+  link: {
+    color: Colors.link,
+    fontWeight: "bold",
+    textDecorationLine: "underline",
+    marginTop: 15,
+    textAlign: "center",
+  },
   type: {
     fontSize: 18,
     color: Colors.icon,

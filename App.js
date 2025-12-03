@@ -2,6 +2,7 @@ import React, { useEffect, useState } from "react";
 import { StatusBar } from "expo-status-bar";
 import { NavigationContainer } from "@react-navigation/native";
 import { createNativeStackNavigator } from "@react-navigation/native-stack";
+import * as SecureStore from "expo-secure-store";
 
 import { LocationProvider } from "./context/LocationContext";
 import usePushNotifications from "./hooks/usePushNotifications";
@@ -16,41 +17,21 @@ import LoginForm from "./screens/Login/LoginForm";
 const Stack = createNativeStackNavigator();
 
 export default function App() {
-  const { getFCMToken } = usePushNotifications();
+  const { registerToken } = usePushNotifications();
   const [user, setUser] = useState(null);
 
   useEffect(() => {
-    const registerToken = async () => {
-      const token = await getFCMToken();
-
-      if (token) {
-        try {
-          const response = await fetch(
-            `${process.env.EXPO_PUBLIC_NOTIFICATIONS_BASE_URL}/subscribe`,
-            {
-              method: "POST",
-              headers: {
-                "Content-Type": "application/json",
-                // 'Authorization': `Bearer ${userJwt}` // for auth later
-              },
-              body: JSON.stringify({
-                userId: user?.id ? user.id : "current_user_id_12345",
-                platform: "mobile",
-                pushToken: token,
-              }),
-            }
-          );
-
-          const data = await response.json();
-          console.log("Backend response:", data); // will replace with
-        } catch (err) {
-          console.error("Failed to sync token with backend:", err);
-        }
+    const handleSubscription = async () => {
+      if (user && user.id) {
+        await registerToken(user.id);
       }
+      // Will need to create an endpoint to fetch user, and compare token
+      // secureStore
+      // const token = await SecureStore.getItemAsync('userToken');
     };
 
-    registerToken();
-  }, []);
+    handleSubscription();
+  }, [user]);
 
   return (
     <LocationProvider>
@@ -59,23 +40,26 @@ export default function App() {
         <Stack.Navigator initialRouteName="Login" screenOptions={{}}>
           {/* <Stack.Navigator initialRouteName="Welcome" screenOptions={{}}> */}
           <Stack.Screen name="Welcome" component={WelcomeScreen} />
-          <Stack.Screen name="Map">
-            {(props) => <MapScreen {...props} user={user} />}
+          <Stack.Screen name="About" component={AboutScreen} />
+          {(props) => <MapScreen {...props} user={user} />}
+          <Stack.Screen name="Details">
+            {(props) => <DetailScreen {...props} user={user} />}
           </Stack.Screen>
-          <Stack.Screen name="Details" component={DetailScreen} />
-          <Stack.Screen
-            name="About"
-            component={AboutScreen}
-            options={{
-              title: "About Karta",
-            }}
-          />
           <Stack.Screen name="Register">
             {(props) => <RegisterForm {...props} setUser={setUser} />}
           </Stack.Screen>
           <Stack.Screen name="Login">
             {(props) => <LoginForm {...props} setUser={setUser} />}
           </Stack.Screen>
+          <Stack.Screen
+            name="Map"
+            component={MapScreen}
+            options={{
+              title: `Map                         Welcome ${
+                user && user?.username
+              }`,
+            }}
+          ></Stack.Screen>
         </Stack.Navigator>
       </NavigationContainer>
     </LocationProvider>

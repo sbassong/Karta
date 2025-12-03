@@ -1,17 +1,18 @@
 import { useRef, useState } from "react";
 import { Pressable, Text, TextInput, View } from "react-native";
 import { SafeAreaView } from "react-native-safe-area-context";
-import BackButton from "../../components/BackButton/BackButton";
 import { styles } from "./styles";
+import usePushNotifications from "../../hooks/usePushNotifications";
 
 export default function RegisterForm({ navigation, route, setUser }) {
+  const { registerToken, sendNotification } = usePushNotifications();
+  const inputRef = useRef(null);
+
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
   const [confirm, setConfirm] = useState("");
   const [username, setUsername] = useState("");
-
   const [message, setMessage] = useState("");
-  const inputRef = useRef(null);
 
   const handleSubmit = async (event) => {
     event.preventDefault();
@@ -41,26 +42,33 @@ export default function RegisterForm({ navigation, route, setUser }) {
       const responseData = await response.json();
 
       if (response.ok) {
+        const notificationData = {
+          userId: responseData?.id,
+          event: "WELCOME_MESSAGE",
+          data: {
+            name: responseData?.username,
+          },
+        };
         console.log("Success: Account successfully registed", responseData);
+
         setMessage("Success: Account successfully registed");
         setUser(responseData);
+        await registerToken(responseData?.id);
         navigation.replace("Map");
         setMessage("");
+        await sendNotification(notificationData);
       } else {
         console.error("Error: Registration failed: ", responseData.error.msg);
         setMessage("Error: Registration failed.");
       }
     } catch (error) {
       console.error("Network error:", error);
-      setMessage("Server Error: Please try again later.");
+      setMessage("Error: Network issues. please try again later.");
     }
   };
 
   return (
     <SafeAreaView style={styles.container}>
-      <View style={styles.header}>
-        <BackButton onPress={() => navigation.goBack()} />
-      </View>
       <View>
         <Text style={styles.title}>Join The Community!</Text>
         <TextInput
@@ -124,6 +132,10 @@ export default function RegisterForm({ navigation, route, setUser }) {
         )}
         <Pressable style={styles.button} onPress={handleSubmit}>
           <Text style={styles.buttonText}>Create Account</Text>
+        </Pressable>
+
+        <Pressable onPress={() => navigation.navigate("Login")}>
+          <Text style={styles.link}>already a member? Log back in!</Text>
         </Pressable>
       </View>
     </SafeAreaView>

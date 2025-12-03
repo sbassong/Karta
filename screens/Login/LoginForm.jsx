@@ -2,15 +2,16 @@ import { useRef, useState } from "react";
 import * as SecureStore from "expo-secure-store";
 import { Pressable, Text, TextInput, View } from "react-native";
 import { SafeAreaView } from "react-native-safe-area-context";
-import BackButton from "../../components/BackButton/BackButton";
 import { styles } from "./styles";
+import usePushNotifications from "../../hooks/usePushNotifications";
 
 export default function LoginForm({ navigation, setUser }) {
+  const { registerToken } = usePushNotifications()
+  const inputRef = useRef(null);
+
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
-
   const [message, setMessage] = useState("");
-  const inputRef = useRef(null);
 
   const handleSubmit = async (event) => {
     event.preventDefault();
@@ -42,7 +43,8 @@ export default function LoginForm({ navigation, setUser }) {
         console.log("Success: Logged in!", responseData);
         setMessage("Success: Logged in!");
         await SecureStore.setItemAsync("userToken", responseData?.token);
-        setUser(responseData.user);
+        setUser(responseData?.user);
+        await registerToken(responseData?.id);
         navigation.replace("Map");
         setMessage("");
       } else {
@@ -57,9 +59,6 @@ export default function LoginForm({ navigation, setUser }) {
 
   return (
     <SafeAreaView style={styles.container}>
-      <View style={styles.header}>
-        <BackButton onPress={() => navigation.goBack()} />
-      </View>
       <View>
         <Text style={styles.title}>See what's new in the community!</Text>
         <TextInput
@@ -99,6 +98,9 @@ export default function LoginForm({ navigation, setUser }) {
         )}
         <Pressable style={styles.button} onPress={handleSubmit}>
           <Text style={styles.buttonText}>Login</Text>
+        </Pressable>
+        <Pressable onPress={() => navigation.navigate("Register")}>
+          <Text style={styles.link}>Not a member? create an account!</Text>
         </Pressable>
       </View>
     </SafeAreaView>

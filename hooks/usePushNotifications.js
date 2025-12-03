@@ -67,7 +67,65 @@ const usePushNotifications = () => {
     return unsubscribe;
   }, []);
 
-  return { fcmToken, getFCMToken, permissionStatus };
+  const registerToken = async (userId) => {
+    const token = await getFCMToken();
+    if (!token) return;
+
+    try {
+      await fetch(
+        `${process.env.EXPO_PUBLIC_NOTIFICATIONS_BASE_URL}/subscribe`,
+        {
+          method: "POST",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify({
+            userId: userId,
+            platform: "mobile",
+            pushToken: token,
+          }),
+        }
+      );
+
+      console.log("Device subscribed for notifications");
+    } catch (error) {
+      console.error("Subscription failed:", error);
+    }
+  };
+
+  const sendNotification = async (userData) => {
+    try {
+      const response = await fetch(
+        `${process.env.EXPO_PUBLIC_NOTIFICATIONS_BASE_URL}/trigger-event`,
+        {
+          method: "POST",
+          headers: {
+            "Content-Type": "application/json",
+          },
+          body: JSON.stringify(userData),
+        }
+      );
+
+      const responseData = await response.json();
+
+      if (response.ok) {
+        console.log("Notification sucessfully sent:", responseData);
+        return `Success: ${responseData.message}`;
+      } else {
+        console.error("Dispatch failed:", responseData.error);
+        return "Dispatch failed:", responseData.error;
+      }
+    } catch (error) {
+      console.error("Network error:", error);
+      return "Error: failed to send notification";
+    }
+  };
+
+  return {
+    fcmToken,
+    getFCMToken,
+    registerToken,
+    sendNotification,
+    permissionStatus,
+  };
 };
 
 export default usePushNotifications;

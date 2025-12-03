@@ -43,7 +43,7 @@ export const styles = StyleSheet.create({
     color: Colors.text,
     borderWidth: 1,
     borderColor: Colors.cardBorder,
-    borderRadius: 12, 
+    borderRadius: 12,
     paddingVertical: 15,
     paddingHorizontal: 20,
     fontSize: 16,
@@ -57,11 +57,20 @@ export const styles = StyleSheet.create({
     elevation: 2,
   },
 
+  link: {
+    color: Colors.link,
+    fontWeight: "bold",
+    textDecorationLine: "underline",
+    marginTop: 15,
+    textAlign: "center",
+  },
+
   button: {
     backgroundColor: Colors.tint,
     paddingVertical: 16,
     borderRadius: 30,
     marginTop: 10,
+    marginBottom: 10,
     alignItems: "center",
 
     shadowColor: Colors.tint,
