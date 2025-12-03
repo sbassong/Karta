@@ -1,7 +1,7 @@
 import { useRef, useState } from "react";
 import { Pressable, Text, TextInput, View } from "react-native";
 import { SafeAreaView } from "react-native-safe-area-context";
-import { event } from "react-native/types_generated/Libraries/Animated/AnimatedExports";
+import BackButton from "../../components/BackButton/BackButton";
 
 export default function RegisterForm({ navigation, route }) {
   const { setUser } = route.params;
@@ -14,13 +14,12 @@ export default function RegisterForm({ navigation, route }) {
   const inputRef = useRef(null);
 
   const handleSubmit = async (event) => {
-    event.preventDefault()
+    event.preventDefault();
 
     if (!email || !password || !confirm || !username) {
       setMessage("Error: Missing fields.");
       return;
     }
-
     if (password !== confirm) return setMessage("Error: Password mismatch.");
 
     if (inputRef.current) {
@@ -41,9 +40,9 @@ export default function RegisterForm({ navigation, route }) {
       if (response.ok) {
         console.log("Success: Account successfully registed", responseData);
         setMessage("Success: Account successfully registed");
-        setUser(responseData)
+        setUser(responseData);
         navigation.replace("Map");
-        setMessage("")
+        setMessage("");
       } else {
         console.error("Error: Registration failed: ", responseData.error.msg);
         setMessage("Error: Registration failed.");
@@ -56,6 +55,9 @@ export default function RegisterForm({ navigation, route }) {
 
   return (
     <SafeAreaView>
+      <View style={styles.header}>
+        <BackButton onPress={() => navigation.goBack()} />
+      </View>
       <View style={styles.container}>
         <Text style={styles.title}>Join The Community!</Text>
         <TextInput

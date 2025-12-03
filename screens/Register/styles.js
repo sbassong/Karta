@@ -1,10 +1,24 @@
 import { StyleSheet } from "react-native";
+import { WarmCommunityColors } from "../../utilities/theme"; 
+
+const Colors = WarmCommunityColors.light;
 
 const styles = StyleSheet.create({
   container: {
     flex: 1,
     justifyContent: "center",
     alignItems: "center",
+    backgroundColor: Colors.background,
+  },
+  header: {
+    flexDirection: "row",
+    alignItems: "center",
+    paddingLeft: 10,
+    paddingTop: 10,
+    position: "absolute",
+    top: 0,
+    left: 0,
+    zIndex: 10,
   },
   input: {
     borderWidth: 1,
