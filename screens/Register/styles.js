@@ -1,67 +1,86 @@
 import { StyleSheet } from "react-native";
-import { WarmCommunityColors } from "../../utilities/theme"; 
+import { WarmCommunityColors } from "../../utilities/theme";
 
 const Colors = WarmCommunityColors.light;
 
-const styles = StyleSheet.create({
+export const styles = StyleSheet.create({
   container: {
     flex: 1,
-    justifyContent: "center",
-    alignItems: "center",
     backgroundColor: Colors.background,
+    justifyContent: "center",
+    paddingHorizontal: 30,
   },
   header: {
-    flexDirection: "row",
-    alignItems: "center",
-    paddingLeft: 10,
-    paddingTop: 10,
     position: "absolute",
-    top: 0,
-    left: 0,
+    top: 10,
+    left: 10,
     zIndex: 10,
-  },
-  input: {
-    borderWidth: 1,
-    borderColor: "gray",
     padding: 10,
-    width: "60%",
-    height: "6%",
-    borderRadius: 10,
-    marginBottom: 10,
-    margin: 20,
   },
-  button: {
-    padding: 10,
-    backgroundColor: "#000000",
-    borderRadius: 10,
+
+  formContent: {
+    paddingHorizontal: 30,
+    width: "100%",
   },
-  buttonText: {
-    color: "white",
-    textAlign: "center",
-  },
+
   title: {
-    fontSize: 26,
+    fontSize: 28,
     fontWeight: "bold",
     color: Colors.text,
     textAlign: "center",
-    marginBottom: 20,
+    marginBottom: 10,
   },
+
   subtitle: {
+    fontSize: 16,
+    color: Colors.icon,
+    textAlign: "center",
+    marginBottom: 30,
+  },
+
+  input: {
+    backgroundColor: Colors.card,
+    color: Colors.text,
+    borderWidth: 1,
+    borderColor: Colors.cardBorder,
+    borderRadius: 12, 
+    paddingVertical: 15,
+    paddingHorizontal: 20,
+    fontSize: 16,
+    marginBottom: 15,
+
+    //subtle shadow
+    shadowColor: "#000",
+    shadowOffset: { width: 0, height: 1 },
+    shadowOpacity: 0.05,
+    shadowRadius: 2,
+    elevation: 2,
+  },
+
+  button: {
+    backgroundColor: Colors.tint,
+    paddingVertical: 16,
+    borderRadius: 30,
+    marginTop: 10,
+    alignItems: "center",
+
+    shadowColor: Colors.tint,
+    shadowOffset: { width: 0, height: 4 },
+    shadowOpacity: 0.3,
+    shadowRadius: 5,
+    elevation: 5,
+  },
+
+  buttonText: {
+    color: Colors.buttonText,
     fontSize: 18,
-    color: Colors.text,
-    textAlign: "center",
-    marginBottom: 20,
-    fontWeight: "500",
+    fontWeight: "600",
   },
+
   message: {
-    fontSize: 16,
+    fontSize: 14,
     textAlign: "center",
-    marginBottom: 20,
-    fontWeight: "500",
-  },
-  body: {
-    fontSize: 16,
-    color: Colors.text,
-    textAlign: "center",
+    marginBottom: 15,
+    fontWeight: "600",
   },
 });

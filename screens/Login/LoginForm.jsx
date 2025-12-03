@@ -1,14 +1,13 @@
 import { useRef, useState } from "react";
+import * as SecureStore from "expo-secure-store";
 import { Pressable, Text, TextInput, View } from "react-native";
 import { SafeAreaView } from "react-native-safe-area-context";
 import BackButton from "../../components/BackButton/BackButton";
 import { styles } from "./styles";
 
-export default function RegisterForm({ navigation, route, setUser }) {
+export default function LoginForm({ navigation, setUser }) {
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
-  const [confirm, setConfirm] = useState("");
-  const [username, setUsername] = useState("");
 
   const [message, setMessage] = useState("");
   const inputRef = useRef(null);
@@ -16,11 +15,10 @@ export default function RegisterForm({ navigation, route, setUser }) {
   const handleSubmit = async (event) => {
     event.preventDefault();
 
-    if (!email || !password || !confirm || !username) {
+    if (!email || !password) {
       setMessage("Error: Missing fields.");
       return;
     }
-    if (password !== confirm) return setMessage("Error: Password mismatch.");
 
     if (inputRef.current) {
       inputRef.current.blur();
@@ -28,27 +26,28 @@ export default function RegisterForm({ navigation, route, setUser }) {
 
     try {
       const response = await fetch(
-        `${process.env.EXPO_PUBLIC_AUTH_BASE_URL}/signup`,
+        `${process.env.EXPO_PUBLIC_AUTH_BASE_URL}/signin`,
         {
           method: "POST",
           headers: {
             "Content-Type": "application/json",
           },
-          body: JSON.stringify({ email, password, username }),
+          body: JSON.stringify({ email, password }),
         }
       );
 
       const responseData = await response.json();
 
       if (response.ok) {
-        console.log("Success: Account successfully registed", responseData);
-        setMessage("Success: Account successfully registed");
-        setUser(responseData);
+        console.log("Success: Logged in!", responseData);
+        setMessage("Success: Logged in!");
+        await SecureStore.setItemAsync("userToken", responseData?.token);
+        setUser(responseData.payload);
         navigation.replace("Map");
         setMessage("");
       } else {
-        console.error("Error: Registration failed: ", responseData.error.msg);
-        setMessage("Error: Registration failed.");
+        console.error("Error: Login failed: ", responseData.error.msg);
+        setMessage("Error: Login failed.");
       }
     } catch (error) {
       console.error("Network error:", error);
@@ -62,7 +61,7 @@ export default function RegisterForm({ navigation, route, setUser }) {
         <BackButton onPress={() => navigation.goBack()} />
       </View>
       <View>
-        <Text style={styles.title}>Join The Community!</Text>
+        <Text style={styles.title}>See what's new in the community!</Text>
         <TextInput
           placeholder="Email"
           value={email}
@@ -87,30 +86,6 @@ export default function RegisterForm({ navigation, route, setUser }) {
           keyboardType="password"
           style={styles.input}
         />
-        <TextInput
-          placeholder="Confirm password"
-          value={confirm}
-          onChangeText={(value) => {
-            message && setMessage("");
-            setConfirm(value);
-          }}
-          ref={inputRef}
-          autoCapitalize="none"
-          keyboardType="password"
-          style={styles.input}
-        />
-        <TextInput
-          placeholder="Username"
-          value={username}
-          onChangeText={(value) => {
-            setMessage("");
-            setUsername(value);
-          }}
-          ref={inputRef}
-          autoCapitalize="none"
-          keyboardType="text"
-          style={styles.input}
-        />
         {message && (
           <Text
             style={{
@@ -123,7 +98,7 @@ export default function RegisterForm({ navigation, route, setUser }) {
           </Text>
         )}
         <Pressable style={styles.button} onPress={handleSubmit}>
-          <Text style={styles.buttonText}>Create Account</Text>
+          <Text style={styles.buttonText}>Login</Text>
         </Pressable>
       </View>
     </SafeAreaView>

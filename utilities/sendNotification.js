@@ -1,12 +1,13 @@
-const BASE_URL = process.env.EXPO_PUBLIC_BASE_URL;
-
 const sendNotification = async (eventData) => {
   try {
-    const response = await fetch(`${BASE_URL}/trigger-event`, {
-      method: "POST",
-      headers: { "Content-Type": "application/json" },
-      body: JSON.stringify(eventData),
-    });
+    const response = await fetch(
+      `${process.env.EXPO_PUBLIC_NOTIFICATIONS_BASE_URL}/trigger-event`,
+      {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify(eventData),
+      }
+    );
 
     const responseData = await response.json();
 

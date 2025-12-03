@@ -1,24 +1,23 @@
-import React, {useEffect, useState} from "react";
+import React, { useEffect, useState } from "react";
 import { StatusBar } from "expo-status-bar";
 import { NavigationContainer } from "@react-navigation/native";
 import { createNativeStackNavigator } from "@react-navigation/native-stack";
 
 import { LocationProvider } from "./context/LocationContext";
-import usePushNotifications from "./hooks/usePushNotifications"
+import usePushNotifications from "./hooks/usePushNotifications";
 
 import MapScreen from "./screens/Map/MapScreen";
 import WelcomeScreen from "./screens/Welcome/WelcomeScreen";
 import AboutScreen from "./screens/About/AboutScreen";
 import DetailScreen from "./screens/Detail/DetailScreen";
 import RegisterForm from "./screens/Register/RegisterForm";
-// import LoginForm from "./screens/Login/LoginForm";
+import LoginForm from "./screens/Login/LoginForm";
 
-const BASE_URL = process.env.EXPO_PUBLIC_BASE_URL;
 const Stack = createNativeStackNavigator();
 
 export default function App() {
   const { getFCMToken } = usePushNotifications();
-  const { user, setUser } = useState(null)
+  const [user, setUser] = useState(null);
 
   useEffect(() => {
     const registerToken = async () => {
@@ -27,7 +26,7 @@ export default function App() {
       if (token) {
         try {
           const response = await fetch(
-            `${BASE_URL}/subscribe`,
+            `${process.env.EXPO_PUBLIC_NOTIFICATIONS_BASE_URL}/subscribe`,
             {
               method: "POST",
               headers: {
@@ -43,7 +42,7 @@ export default function App() {
           );
 
           const data = await response.json();
-          console.log("Backend response:", data); // will replace with 
+          console.log("Backend response:", data); // will replace with
         } catch (err) {
           console.error("Failed to sync token with backend:", err);
         }
@@ -57,9 +56,12 @@ export default function App() {
     <LocationProvider>
       <StatusBar style="auto" />
       <NavigationContainer>
-        <Stack.Navigator initialRouteName="Welcome" screenOptions={{}}>
+        <Stack.Navigator initialRouteName="Login" screenOptions={{}}>
+          {/* <Stack.Navigator initialRouteName="Welcome" screenOptions={{}}> */}
           <Stack.Screen name="Welcome" component={WelcomeScreen} />
-          <Stack.Screen name="Map" component={MapScreen} />
+          <Stack.Screen name="Map">
+            {(props) => <MapScreen {...props} user={user} />}
+          </Stack.Screen>
           <Stack.Screen name="Details" component={DetailScreen} />
           <Stack.Screen
             name="About"
@@ -67,22 +69,13 @@ export default function App() {
             options={{
               title: "About Karta",
             }}
-            initialParams={setUser}
           />
-          <Stack.Screen
-            name="Register"
-            component={RegisterForm}
-            options={{
-              title: "About Karta",
-            }}
-          />
-          {/* <Stack.Screen
-            name="Login"
-            component={LoginForm}
-            options={{
-              title: "About Karta",
-            }}
-          /> */}
+          <Stack.Screen name="Register">
+            {(props) => <RegisterForm {...props} setUser={setUser} />}
+          </Stack.Screen>
+          <Stack.Screen name="Login">
+            {(props) => <LoginForm {...props} setUser={setUser} />}
+          </Stack.Screen>
         </Stack.Navigator>
       </NavigationContainer>
     </LocationProvider>

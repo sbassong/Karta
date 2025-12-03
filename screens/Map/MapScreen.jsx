@@ -20,7 +20,7 @@ import { OSM_RASTER_STYLE } from "../../utilities/mapStyle";
 
 const Colors = WarmCommunityColors.light;
 
-export default function MapScreen({ navigation }) {
+export default function MapScreen({ navigation, user}) {
   const { location, errorMsg, isLoading } = useLocation();
   const cameraRef = useRef(null);
 
@@ -73,6 +73,9 @@ export default function MapScreen({ navigation }) {
   return (
     <View style={styles.container}>
       {/* dropdown and view mode icon */}
+      <View>
+        <Text style={styles.calloutText}>{`Welcome ${user?.name}`}</Text>
+      </View>
       <View style={styles.topBar}>
         <FilterDropdown filter={filter} onValueChange={setFilter} />
         <TouchableOpacity
@@ -117,9 +120,7 @@ export default function MapScreen({ navigation }) {
               <Callout onPress={() => goToDetails(poi)}>
                 <View style={styles.calloutBubble}>
                   <Text style={styles.calloutText}>{poi.name}</Text>
-                  <Text style={styles.calloutSubText}>
-                    Tap for details
-                  </Text>
+                  <Text style={styles.calloutSubText}>Tap for details</Text>
                 </View>
               </Callout>
             </PointAnnotation>
