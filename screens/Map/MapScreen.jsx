@@ -2,7 +2,7 @@ import React, { useState, useMemo, useRef } from "react";
 import { View, Text, ActivityIndicator, TouchableOpacity } from "react-native";
 import {
   MapView,
-Camera,
+  Camera,
   PointAnnotation,
   Callout,
 } from "@maplibre/maplibre-react-native";
@@ -20,7 +20,7 @@ import { OSM_RASTER_STYLE } from "../../utilities/mapStyle";
 
 const Colors = WarmCommunityColors.light;
 
-export default function MapScreen({ navigation, user}) {
+export default function MapScreen({ navigation, user }) {
   const { location, errorMsg, isLoading } = useLocation();
   const cameraRef = useRef(null);
 
@@ -73,9 +73,6 @@ export default function MapScreen({ navigation, user}) {
   return (
     <View style={styles.container}>
       {/* dropdown and view mode icon */}
-      <View>
-        <Text style={styles.calloutText}>{`Welcome ${user?.name}`}</Text>
-      </View>
       <View style={styles.topBar}>
         <FilterDropdown filter={filter} onValueChange={setFilter} />
         <TouchableOpacity
@@ -138,4 +135,3 @@ export default function MapScreen({ navigation, user}) {
     </View>
   );
 }
-

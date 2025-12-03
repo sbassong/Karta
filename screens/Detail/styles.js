@@ -19,6 +19,7 @@ export const styles = StyleSheet.create({
   carouselContainer: {
     marginTop: 5,
     height: 250,
+    position: "relative",
     backgroundColor: "#f0f0f0",
   },
   scrollView: {
@@ -61,5 +62,27 @@ export const styles = StyleSheet.create({
     fontSize: 18,
     color: Colors.text,
     marginLeft: 8,
+  },
+  // container: {
+  //   position: "absolute",
+  //   bottom: 30,
+  //   right: 20,
+  //   alignItems: "center",
+  // },
+  button: {
+    position: "absolute",
+    top: 0,
+    right: 0,
+    zIndex: 10,
+    // backgroundColor: "white",
+    // borderRadius: 20,
+    padding: 5,
+    // elevation: 5,
+    // shadowColor: "#000",
+    // shadowOpacity: 0.3,
+    // shadowRadius: 3,
+    // shadowOffset: { width: 0, height: 2 },
+    marginTop: 10,
+    marginRight: 10,
   },
 });

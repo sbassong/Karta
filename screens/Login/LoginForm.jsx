@@ -1,11 +1,11 @@
-import { useRef, useState } from "react";
+import { useEffect, useRef, useState } from "react";
 import * as SecureStore from "expo-secure-store";
 import { Pressable, Text, TextInput, View } from "react-native";
 import { SafeAreaView } from "react-native-safe-area-context";
 import { styles } from "./styles";
 import usePushNotifications from "../../hooks/usePushNotifications";
 
-export default function LoginForm({ navigation, setUser }) {
+export default function LoginForm({ navigation, user, setUser }) {
   const { registerToken } = usePushNotifications()
   const inputRef = useRef(null);
 
@@ -42,7 +42,7 @@ export default function LoginForm({ navigation, setUser }) {
       if (response.ok) {
         console.log("Success: Logged in!", responseData);
         setMessage("Success: Logged in!");
-        await SecureStore.setItemAsync("userToken", responseData?.token);
+        // await SecureStore.setItemAsync("userToken", responseData?.token); TODO
         setUser(responseData?.user);
         await registerToken(responseData?.id);
         navigation.replace("Map");
@@ -56,6 +56,12 @@ export default function LoginForm({ navigation, setUser }) {
       setMessage("Server Error: Please try again later.");
     }
   };
+
+  useEffect(() => {
+    if (user && user.id) {
+      navigation.navigate("Map")
+    }
+  }, [])
 
   return (
     <SafeAreaView style={styles.container}>
