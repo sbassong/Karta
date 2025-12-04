@@ -15,6 +15,8 @@ export default function LoginForm({ navigation, user, setUser }) {
 
   const handleSubmit = async (event) => {
     event.preventDefault();
+    console.log(" ")
+    console.log(" => Logging in now")
 
     if (!email || !password) {
       setMessage("Error: Missing fields.");
@@ -40,9 +42,9 @@ export default function LoginForm({ navigation, user, setUser }) {
       const responseData = await response.json();
 
       if (response.ok) {
-        console.log("Success: Logged in!", responseData);
+        console.log("Success: Logged in! =>", responseData);
         setMessage("Success: Logged in!");
-        // await SecureStore.setItemAsync("userToken", responseData?.token); TODO
+        await SecureStore.setItemAsync("userToken", responseData?.token);
         setUser(responseData?.user);
         await registerToken(responseData?.id);
         navigation.replace("Map");
@@ -69,6 +71,7 @@ export default function LoginForm({ navigation, user, setUser }) {
         <Text style={styles.title}>See what's new in the community!</Text>
         <TextInput
           placeholder="Email"
+          placeholderTextColor="#6D6A62"
           value={email}
           onChangeText={(value) => {
             message && setMessage("");
@@ -81,6 +84,7 @@ export default function LoginForm({ navigation, user, setUser }) {
         />
         <TextInput
           placeholder="Password"
+          placeholderTextColor="#6D6A62"
           value={password}
           onChangeText={(value) => {
             message && setMessage("");

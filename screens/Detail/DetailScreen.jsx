@@ -15,29 +15,29 @@ import { styles } from "./styles";
 import { WarmCommunityColors } from "../../utilities/theme";
 import { Ionicons } from "@expo/vector-icons";
 import ReportModal from "../../components/ReportModal/ReportModal";
+import { addImageToPoi } from "../../helpers/addImage";
 
 const { width: screenWidth } = Dimensions.get("window"); // for thee carousel
 const Colors = WarmCommunityColors.light;
 
 export default function DetailScreen({ route, navigation, user }) {
-  // item data passed from MapScreen
-  const { item } = route.params;
+  const { item } = route.params; // item data passed from MapScreen
 
   const [modalVisible, setModalVisible] = useState(false);
-  const [image, setImage] = useState(false);
+  const [currentImages, setCurrentImages] = useState(item?.images || []);
   const [message, setMessage] = useState("");
 
   const handleReportSubmit = async (reportData) => {
+    console.log(" ")
+    console.log("=> preparing to submit report")
     setModalVisible(false);
 
     const payload = {
-      poiId: item.id,
-      userId: "CURRENT_USER_ID",
+      poiId: item._id,
+      userId: user ? user.id : "CURRENT_USER_ID",
       status: reportData.status,
       note: reportData.note,
     };
-
-    console.log("Submitting Report:", payload);
 
     try {
       const response = await fetch(process.env.EXPO_PUBLIC_REPORTING_BASE_URL, {
@@ -46,28 +46,29 @@ export default function DetailScreen({ route, navigation, user }) {
         body: JSON.stringify(payload),
       });
 
+      const data = await response.json()
+
       if (response.ok) {
-        console.log(
-          "Success: Report submitted, thank you for helping the community"
-        );
+        console.log("report submitted ==>" ,data.report )
         setMessage(
           "Success: Report submitted, thank you for helping the community"
         );
       } else {
-        console.log("Error: Failed to submit report.");
         setMessage("Error: Failed to submit report.");
       }
-
-      setTimeout(() => {
-        setMessage("");
-      }, 1500);
     } catch (err) {
       console.error(err);
       setMessage("Error: network issues");
+    } finally {
+      setTimeout(() => {
+        setMessage("");
+      }, 1500);
     }
   };
 
-  const pickImage = async () => {
+  const handlePickImage = async () => {
+    console.log(" ")
+    console.log("=> opening picker")
     let result = await ImagePicker.launchImageLibraryAsync({
       mediaTypes: "Images",
       allowsEditing: false,
@@ -75,95 +76,71 @@ export default function DetailScreen({ route, navigation, user }) {
       quality: 1,
     });
 
-    const asset = result.assets[0]
-    console.log("1. Picker Result Object:", JSON.stringify(result, null, 2));
+    const asset = result.assets[0];
 
-    // if (result.canceled) {
-    //   console.log("1.1 - Picker was canceled by system or user.");
-    //   return;
-    // }
-
-    // const file = result.assets[0];
-    // console.log("2. - Picked:", file);
-    // setImage(file);
-    
-    // const formData = new FormData();
-    // formData.append("image", file);
-
-      let localUri = asset.uri;
-      if (Platform.OS === "android" && !localUri.startsWith("file://")) {
-        localUri = `file://${localUri}`;
-      }
-      console.log("2. - localUri:", localUri);
-
-    
-    // try {
-      const filename = localUri.split("/").pop() || "upload.jpg";
-
-      const match = /\.(\w+)$/.exec(filename);
-      const type = asset.mimeType || (match ? `image/${match[1]}` : `image/jpeg`);
-  
-      const formData = new FormData();
-
-      formData.append("image", {
-        uri: localUri,
-        name: filename,
-        type: type,
-      });
-      console.log("3. - formData:", formData);
-      
-    // } catch (error) {
-    //       console.error(error);
-    // }
-    // 2. Determine the file name (or just fake it)
-
-    try {
-      
-      console.log("4. Uploading file:", { uri: localUri, name: filename, type });
-    } catch (error) {
-            console.error(error);
+    let localUri = asset.uri;
+    if (Platform.OS === "android" && !localUri.startsWith("file://")) {
+      localUri = `file://${localUri}`;
     }
 
+    const filename = localUri.split("/").pop() || "upload.jpg";
+    const match = /\.(\w+)$/.exec(filename);
+    const type = asset.mimeType || (match ? `image/${match[1]}` : `image/jpeg`);
+
+    const formData = new FormData();
+
+    formData.append("image", {
+      uri: localUri,
+      name: filename,
+      type: type,
+    });
+   console.log("=> sending image to service ");
     try {
       const response = await fetch(
         `${process.env.EXPO_PUBLIC_IMAGE_BASE_URL}`,
         {
           method: "POST",
           body: formData,
-          headers: {},
+          headers: {}, // formdata content type is automatically sent
         }
       );
-
+      
       const data = await response.json();
 
       if (response.ok) {
         const s3Url = data.url;
-        console.log("5. - upload success! S3 URL:", s3Url);
-
-        setMessage("Success: Image uploaded successfully!");
+        s3Url && setMessage("Success: Image uploaded.");
+        setCurrentImages([...currentImages, s3Url])
+        console.log("returned s3Rrl from service ==> ", s3Url);
+        const updatedPoi = await addImageToPoi(item._id, s3Url);
+        console.log("Updated POI _id ==> ", updatedPoi?._id )
       } else {
-        console.error("Upload failed:", data);
         setMessage("Error: Upload failed.");
       }
     } catch (error) {
-      console.error("Network Error:", error);
+      console.error("Server Error:", error);
       setMessage("Error: Could not reach upload service.");
+    } finally {
+      setTimeout(() => {
+        setMessage("");
+      }, 1500);
     }
   };
+
   return (
     <SafeAreaView style={styles.container}>
-      <TouchableOpacity style={styles.button} onPress={() => pickImage()}>
+      <TouchableOpacity style={styles.button} onPress={() => handlePickImage()}>
         <Ionicons name="images" size={28} color={Colors.tint} />
       </TouchableOpacity>
       <View style={styles.carouselContainer}>
         <ScrollView
           horizontal
           pagingEnabled
-          showsHorizontalScrollIndicator={false}
+          showsHorizontalScrollIndicator={true}
           style={styles.scrollView}
         >
-          {item.images.length > 0 &&
-            item.images.map((url, index) => (
+          {currentImages?.length > 0 &&
+            currentImages.map((url, index) => (
               <Image
                 key={index}
                 source={{ uri: url }}

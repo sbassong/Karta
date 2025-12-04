@@ -1,14 +1,14 @@
-import React, { useState, useMemo, useRef } from "react";
+import { useState, useMemo, useRef, useCallback } from "react";
 import { View, Text, ActivityIndicator, TouchableOpacity } from "react-native";
 import {
   MapView,
   Camera,
   PointAnnotation,
-  Callout,
+  UserLocation,
 } from "@maplibre/maplibre-react-native";
+import { useFocusEffect } from "@react-navigation/native";
 import { styles } from "./styles";
 import { useLocation } from "../../hooks/useLocation";
-import { POI_DATA } from "../../data/poi";
 import { MaterialIcons } from "@expo/vector-icons";
 import { WarmCommunityColors } from "../../utilities/theme";
 
@@ -20,20 +20,22 @@ import { OSM_RASTER_STYLE } from "../../utilities/mapStyle";
 
 const Colors = WarmCommunityColors.light;
 
-export default function MapScreen({ navigation, user }) {
+export default function MapScreen({ navigation }) {
   const { location, errorMsg, isLoading } = useLocation();
   const cameraRef = useRef(null);
 
   const [viewMode, setViewMode] = useState("map"); // 'map' or 'list'
   const [filter, setFilter] = useState("All");
+  const [allPois, setAllPois] = useState(null);
+  const [selectedPoi, setSelectedPoi] = useState(null);
 
   // memoized re-calculation of the list when the filter or data changes
-  const filteredData = useMemo(() => {
+  const filteredPois = useMemo(() => {
     if (filter === "All") {
-      return POI_DATA;
+      return allPois;
     }
-    return POI_DATA.filter((poi) => poi.type === filter);
-  }, [filter]);
+    return allPois.filter((poi) => poi.type === filter);
+  }, [filter, allPois]);
 
   const goToDetails = (poi) => {
     navigation.navigate("Details", { item: poi });
@@ -52,6 +54,35 @@ export default function MapScreen({ navigation, user }) {
       });
     }
   };
+
+  useFocusEffect(
+    useCallback(() => {
+      const fetchPois = async () => {
+        try {
+          console.log(" ")
+          console.log("=> Fetching POIs from DB...");
+          const response = await fetch(
+            `${process.env.EXPO_PUBLIC_BASE_URL_ANDROID}/api/pois`,
+            {
+              method: "GET",
+              headers: { "Content-Type": "application/json" },
+            }
+          );
+
+          if (!response.ok) throw new Error("Server error");
+
+          const data = await response.json();
+          console.log(`=> Loaded ${data.length} POIs`);
+
+          setAllPois(data);
+        } catch (error) {
+          console.error("Fetch failed:", error);
+        }
+      };
+
+      fetchPois();
+    }, [])
+  );
 
   if (isLoading) {
     return (
@@ -87,44 +118,65 @@ export default function MapScreen({ navigation, user }) {
         </TouchableOpacity>
       </View>
 
-      {/* conditionally render map or list */}
       {viewMode === "map" ? (
-        <MapView
-          style={styles.map}
-          mapStyle={JSON.stringify(OSM_RASTER_STYLE)}
-          logoEnabled={false}
-          attributionEnabled={true}
-        >
-          {/* handles the view region */}
-          <Camera
-            ref={cameraRef}
-            defaultSettings={{
-              centerCoordinate: [10.922643, 3.596563], // lng first
-              zoomLevel: 12,
-            }}
-          />
+        <>
+          <MapView
+            style={styles.map}
+            mapStyle={JSON.stringify(OSM_RASTER_STYLE)}
+            logoEnabled={false}
+            attributionEnabled={true}
+          >
+            {/* handles the view region */}
+            <Camera
+              ref={cameraRef}
+              defaultSettings={{
+                centerCoordinate: [10.922643, 3.596563], // lng first
+                zoomLevel: 12,
+              }}
+            />
+            <UserLocation
+              visible={true}
+              // showsUserHeadingIndicator={true}
+            />
 
-          {filteredData.map((poi) => (
-            <PointAnnotation
-              key={poi.id}
-              id={poi.id}
-              // !! object {lat, long} needs to be converted to Array [long, lat]
-              coordinate={[poi.coordinates.longitude, poi.coordinates.latitude]}
-            >
-              <CustomMarkerIcon type={poi.type} />
-
-              {/* bubble/tooltip that appears when clicked */}
-              <Callout onPress={() => goToDetails(poi)}>
-                <View style={styles.calloutBubble}>
-                  <Text style={styles.calloutText}>{poi.name}</Text>
-                  <Text style={styles.calloutSubText}>Tap for details</Text>
+            {filteredPois?.length > 0 &&
+              filteredPois?.map((poi) => (
+                <PointAnnotation
+                  key={poi._id}
+                  id={poi._id}
+                  // !! object {lat, long} needs to be converted to Array [long, lat]
+                  coordinate={[
+                    poi.coordinates.longitude,
+                    poi.coordinates.latitude,
+                  ]}
+                  onSelected={() => setSelectedPoi(poi)}
+                  onDeselected={() => setSelectedPoi(null)}
+                >
+                  <CustomMarkerIcon type={poi.type} />
+                </PointAnnotation>
+              ))}
+          </MapView>
+          {selectedPoi && (
+            <View style={styles.bottomCardContainer}>
+              <View style={styles.bottomCard}>
+                <View style={styles.textContainer}>
+                  <Text style={styles.cardTitle}>{selectedPoi.name}</Text>
+                  <Text style={styles.cardSubtitle}>{selectedPoi.type}</Text>
                 </View>
-              </Callout>
-            </PointAnnotation>
-          ))}
-        </MapView>
+
+                <TouchableOpacity
+                  style={styles.detailsButton}
+                  onPress={() => goToDetails(selectedPoi)}
+                >
+                  <Text style={styles.buttonText}>Details</Text>
+                  <MaterialIcons name="arrow-forward" size={20} color="white" />
+                </TouchableOpacity>
+              </View>
+            </View>
+          )}
+        </>
       ) : (
-        <ServiceList data={filteredData} onSelectItem={goToDetails} />
+        <ServiceList data={filteredPois} onSelectItem={goToDetails} />
       )}
 
       <MapButtons

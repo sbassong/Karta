@@ -17,6 +17,9 @@ export default function RegisterForm({ navigation, route, setUser }) {
   const handleSubmit = async (event) => {
     event.preventDefault();
 
+    console.log(" ");
+    console.log("=> Registering account now");
+
     if (!email || !password || !confirm || !username) {
       setMessage("Error: Missing fields.");
       return;
@@ -50,13 +53,16 @@ export default function RegisterForm({ navigation, route, setUser }) {
           },
         };
         console.log("Success: Account successfully registed", responseData);
-
+        
         setMessage("Success: Account successfully registed");
         setUser(responseData);
+        console.log(" => Registering user device");
         await registerToken(responseData?.id);
-        navigation.replace("Map");
         setMessage("");
+        console.log(" ")
+        console.log("=> sending welcome notification to registered user ")
         await sendNotification(notificationData);
+        navigation.replace("Map");
       } else {
         console.error("Error: Registration failed: ", responseData.error.msg);
         setMessage("Error: Registration failed.");
@@ -73,6 +79,7 @@ export default function RegisterForm({ navigation, route, setUser }) {
         <Text style={styles.title}>Join The Community!</Text>
         <TextInput
           placeholder="Email"
+          placeholderTextColor="#6D6A62"
           value={email}
           onChangeText={(value) => {
             message && setMessage("");
@@ -85,6 +92,7 @@ export default function RegisterForm({ navigation, route, setUser }) {
         />
         <TextInput
           placeholder="Password"
+          placeholderTextColor="#6D6A62"
           value={password}
           onChangeText={(value) => {
             message && setMessage("");
@@ -97,6 +105,7 @@ export default function RegisterForm({ navigation, route, setUser }) {
         />
         <TextInput
           placeholder="Confirm password"
+          placeholderTextColor="#6D6A62"
           value={confirm}
           onChangeText={(value) => {
             message && setMessage("");
@@ -109,6 +118,7 @@ export default function RegisterForm({ navigation, route, setUser }) {
         />
         <TextInput
           placeholder="Username"
+          placeholderTextColor="#6D6A62"
           value={username}
           onChangeText={(value) => {
             setMessage("");

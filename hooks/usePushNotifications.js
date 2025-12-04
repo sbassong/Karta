@@ -107,7 +107,7 @@ const usePushNotifications = () => {
       const responseData = await response.json();
 
       if (response.ok) {
-        console.log("Notification sucessfully sent:", responseData);
+        console.log("Notification sucessfully sent: ==>", responseData);
         return `Success: ${responseData.message}`;
       } else {
         console.error("Dispatch failed:", responseData.error);
