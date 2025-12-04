@@ -68,7 +68,7 @@ export const styles = StyleSheet.create({
     right: 0,
     zIndex: 10,
     padding: 5,
-    marginTop: 25,
+    marginTop: 10,
     marginRight: 5,
   },
   reportButton: {

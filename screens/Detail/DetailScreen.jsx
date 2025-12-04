@@ -7,6 +7,7 @@ import {
   Dimensions,
   TouchableOpacity,
   Pressable,
+  Platform,
 } from "react-native";
 import * as ImagePicker from "expo-image-picker";
 import { SafeAreaView } from "react-native-safe-area-context";
@@ -23,7 +24,7 @@ export default function DetailScreen({ route, navigation, user }) {
   const { item } = route.params;
 
   const [modalVisible, setModalVisible] = useState(false);
-  const [imageVisible, setImageVisible] = useState(false);
+  const [image, setImage] = useState(false);
   const [message, setMessage] = useState("");
 
   const handleReportSubmit = async (reportData) => {
@@ -58,8 +59,8 @@ export default function DetailScreen({ route, navigation, user }) {
       }
 
       setTimeout(() => {
-        setMessage("")
-      }, 1500)
+        setMessage("");
+      }, 1500);
     } catch (err) {
       console.error(err);
       setMessage("Error: network issues");
@@ -68,20 +69,90 @@ export default function DetailScreen({ route, navigation, user }) {
 
   const pickImage = async () => {
     let result = await ImagePicker.launchImageLibraryAsync({
-      mediaTypes: ImagePicker.MediaType.Images,
-      allowsEditing: true,
+      mediaTypes: "Images",
+      allowsEditing: false,
+      aspect: [4, 3],
       quality: 1,
     });
 
-    if (!result.canceled) {
-      console.log(result.assets[0].uri);
-      // setImage(result.assets[0].uri);
+    const asset = result.assets[0]
+    console.log("1. Picker Result Object:", JSON.stringify(result, null, 2));
+
+    // if (result.canceled) {
+    //   console.log("1.1 - Picker was canceled by system or user.");
+    //   return;
+    // }
+
+    // const file = result.assets[0];
+    // console.log("2. - Picked:", file);
+    // setImage(file);
+    
+    // const formData = new FormData();
+    // formData.append("image", file);
+
+      let localUri = asset.uri;
+      if (Platform.OS === "android" && !localUri.startsWith("file://")) {
+        localUri = `file://${localUri}`;
+      }
+      console.log("2. - localUri:", localUri);
+
+    
+    // try {
+      const filename = localUri.split("/").pop() || "upload.jpg";
+
+      const match = /\.(\w+)$/.exec(filename);
+      const type = asset.mimeType || (match ? `image/${match[1]}` : `image/jpeg`);
+  
+      const formData = new FormData();
+
+      formData.append("image", {
+        uri: localUri,
+        name: filename,
+        type: type,
+      });
+      console.log("3. - formData:", formData);
+      
+    // } catch (error) {
+    //       console.error(error);
+    // }
+    // 2. Determine the file name (or just fake it)
+
+    try {
+      
+      console.log("4. Uploading file:", { uri: localUri, name: filename, type });
+    } catch (error) {
+            console.error(error);
+    }
+
+    try {
+      const response = await fetch(
+        `${process.env.EXPO_PUBLIC_IMAGE_BASE_URL}`,
+        {
+          method: "POST",
+          body: formData,
+          headers: {},
+        }
+      );
+
+      const data = await response.json();
+
+      if (response.ok) {
+        const s3Url = data.url;
+        console.log("5. - upload success! S3 URL:", s3Url);
+
+        setMessage("Success: Image uploaded successfully!");
+      } else {
+        console.error("Upload failed:", data);
+        setMessage("Error: Upload failed.");
+      }
+    } catch (error) {
+      console.error("Network Error:", error);
+      setMessage("Error: Could not reach upload service.");
     }
   };
-
   return (
     <SafeAreaView style={styles.container}>
-      <TouchableOpacity style={styles.button} onPress={pickImage}>
+      <TouchableOpacity style={styles.button} onPress={() => pickImage()}>
         <Ionicons name="images" size={28} color={Colors.tint} />
       </TouchableOpacity>
       <View style={styles.carouselContainer}>
@@ -118,9 +189,7 @@ export default function DetailScreen({ route, navigation, user }) {
             style={{
               ...styles.message,
               color:
-                message.split(":")[0] === "Success"
-                  ? "#09a404ff"
-                  : "#f80303ff",
+                message.split(":")[0] === "Success" ? "#09a404ff" : "#f80303ff",
             }}
           >
             {message}
