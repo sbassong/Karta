@@ -38,8 +38,7 @@ export default function App() {
     <LocationProvider>
       <StatusBar style="auto" />
       <NavigationContainer>
-        <Stack.Navigator initialRouteName="Login" screenOptions={{}}>
-          {/* <Stack.Navigator initialRouteName="Welcome" screenOptions={{}}> */}
+        <Stack.Navigator initialRouteName="Welcome" screenOptions={{}}>
           <Stack.Screen name="Welcome" component={WelcomeScreen} />
           <Stack.Screen name="About" component={AboutScreen} />
           {(props) => <MapScreen {...props} user={user} />}
@@ -50,7 +49,7 @@ export default function App() {
             {(props) => <RegisterForm {...props} setUser={setUser} />}
           </Stack.Screen>
           <Stack.Screen name="Login">
-            {(props) => <LoginForm {...props} user={user}  setUser={setUser} />}
+            {(props) => <LoginForm {...props} user={user} setUser={setUser} />}
           </Stack.Screen>
           <Stack.Screen
             name="Map"

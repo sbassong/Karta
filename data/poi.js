@@ -29,7 +29,7 @@ export const POI_DATA = [
     id: "3",
     name: "Makak Water Center #2",
     type: "Water",
-    locationName: "Makak, Cameroon ff  f",
+    locationName: "Makak, Cameroon",
     coordinates: {
       latitude: 3.550978,
       longitude: 11.021695,
