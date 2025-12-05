@@ -42,8 +42,8 @@ export default function WelcomeScreen({ navigation }) {
         />
         <Text style={styles.title}>Welcome to Karta, Your Village Map</Text>
         <Text style={styles.subtitle}>
-          This app works OFFLINE. Find clinics, water, and other essential
-          services near, even without internet.
+          Find clinics, water, and other essential
+          services near.
         </Text>
         <Text style={styles.body}>
           To show local services, Karta needs to access your location.

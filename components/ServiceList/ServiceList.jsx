@@ -20,9 +20,9 @@ export default function ServiceList({ data, onSelectItem }) {
   return (
     <ScrollView style={styles.container}>
       <Text style={styles.title}>Nearby Services</Text>
-      {data.map((poi) => (
+      {data?.length > 0 && data.map((poi) => (
         <TouchableOpacity
-          key={poi.id}
+          key={poi._id}
           style={styles.itemContainer}
           onPress={() => onSelectItem(poi)}
         >
