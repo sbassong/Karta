@@ -4,7 +4,6 @@ import { StatusBar } from "expo-status-bar";
 import { NavigationContainer } from "@react-navigation/native";
 import { createNativeStackNavigator } from "@react-navigation/native-stack";
 import {styles} from "./components/LoginIcon/styles"
-import { LogBox } from "react-native";
 // import * as SecureStore from "expo-secure-store";
 
 import { LocationProvider } from "./context/LocationContext";
@@ -20,14 +19,6 @@ import LoginIcon from "./components/LoginIcon/LoginIcon";
 
 const Stack = createNativeStackNavigator();
 
-LogBox.ignoreLogs([
-  /MapLibre \[info\] Request Request failed due to a permanent error: Canceled .*/,
-  'MapLibre [info] Request failed due to a permanent error: Canceled  {"level": "warning", "message": "Request failed due to a permanent error: Canceled ", "tag": "Mbgl-HttpRequest"}',
-  "This method is deprecated (as well as all React Native Firebase namespaced API) and will be removed in the next major release as part of move to match Firebase Web modular SDK API. Please see migration guide for more details: https://rnfirebase.io/migrating-to-v22. Method called was `onTokenRefresh`. Please use `onTokenRefresh()` instead.",
-  "This method is deprecated (as well as all React Native Firebase namespaced API) and will be removed in the next major release as part of move to match Firebase Web modular SDK API. Please see migration guide for more details: https://rnfirebase.io/migrating-to-v22. Method called was `onTokenRefresh`. Please use `onTokenRefresh()` instead.",
-  /Request failed due to a permanent error" .* /,
-  /This method is deprecated .*/,
-]);
 
 export default function App() {
   const { registerToken } = usePushNotifications();
@@ -51,7 +42,7 @@ export default function App() {
     <LocationProvider>
       <StatusBar style="auto" />
       <NavigationContainer>
-        <Stack.Navigator initialRouteName="Welcome" screenOptions={{}}>
+        <Stack.Navigator initialRouteName="Login" screenOptions={{}}>
           <Stack.Screen name="Welcome" component={WelcomeScreen} />
           <Stack.Screen name="About" component={AboutScreen} />
           {(props) => <MapScreen {...props} user={user} />}
