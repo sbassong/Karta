@@ -130,8 +130,8 @@ export default function MapScreen({ navigation }) {
             <Camera
               ref={cameraRef}
               defaultSettings={{
-                centerCoordinate: [10.922643, 3.596563], // lng first
-                zoomLevel: 12,
+                centerCoordinate: [10.942643, 3.596563], // lng first
+                zoomLevel: 10,
               }}
             />
             <UserLocation
